@@ -1,31 +1,30 @@
 import React from 'react'
 import { createSelector } from 'reselect'
+
 import api from './services/api'
 import Selector from './components/Selector'
+import Table from './components/Table'
 
 /* View - view handling */
 const AppView = ({
   loading,
-  error,
   bases,
   quotes,
   base,
   quote,
+  stats,
   onSelect,
   onRequestStats
-}) => {
-  if (loading) return <p>Loading...</p>
-
-  if (error) return <p>'Error!'</p>
-
-  return (
+}) => (
     <div>
       <Selector
+        label={'Base Currency: '}
         name={'base'}
         dataKey={'base_currency'}
         onSelect={onSelect}
         options={bases}/>
       <Selector
+        label={'Quote Currency: '}
         name={'quote'}
         dataKey={'quote_currency'}
         onSelect={onSelect}
@@ -34,11 +33,12 @@ const AppView = ({
         type="button"
         disabled={!base || !quote}
         onClick={() => onRequestStats(base, quote)}>
-        Show Stats
-        </button>
+        Show 24 Stats
+      </button>
+      {loading && <p>Loading...</p>}
+      <Table data={stats} />
     </div>
-  )
-}
+)
 
 /* Presenter - data and state management */
 const withDataFetching = Component => class App extends React.Component {
@@ -94,6 +94,7 @@ const withDataFetching = Component => class App extends React.Component {
   onLoading = (callback, ...params) => this.setState({
     ui: {
       ...this.state.ui,
+      error: null,
       loading: true
     }
   }, () => callback(...params))
@@ -117,13 +118,16 @@ const withDataFetching = Component => class App extends React.Component {
   onError = error => this.setState({
     ui: {
       ...this.state.ui,
-      error,
+      error: JSON.stringify(error.data),
       loading: false
     }
   })
 
   onStatsSuccess = stats => this.setState({
-    stats,
+    data: {
+      ...this.state.data,
+      stats
+    },
     ui: {
       ...this.state.ui,
       loading: false
@@ -160,13 +164,18 @@ const withDataFetching = Component => class App extends React.Component {
   getProducts = () => this.onLoading(api.getProducts, this.onProductsSuccess, this.onError)
 
   getStats = (base, quote) => {
-    const params = `${base}-${quote}`
+    const query = {
+      product_id: `${base}-${quote}`
+    }
 
-    this.onLoading(api.getStats, params, this.onStatsSuccess, this.onError)
+    this.onLoading(api.getStats, query, this.onStatsSuccess, this.onError)
   }
 
   render() {
-    return <Component { ...this.state.ui } { ...this.state.domain } />
+    return <Component
+      { ...this.state.data }
+      { ...this.state.ui }
+      { ...this.state.domain } />
   }
 }
 
