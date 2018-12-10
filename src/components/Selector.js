@@ -4,15 +4,19 @@ const mapOptions = (val, idx) => <option value={val} key={idx}>{val}</option>
 
 const Selector = (props) => {
   const {
+    label,
     name,
     options,
     onSelect
   } = props
 
   return (
-    <select name={name} onChange={onSelect}>
-      {options.map(mapOptions)}
-    </select>
+    <div>
+      <label>{label}</label>
+      <select name={name} onChange={onSelect}>
+        {options.map(mapOptions)}
+      </select>
+    </div>
   )
 }
 
