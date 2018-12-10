@@ -90,7 +90,7 @@ const withDataFetching = Component => class App extends React.Component {
       .map(p => p.quote_currency)
   )
 
-  /* State Handlers */
+  /* --- State Handlers --- */
   onLoading = (callback, ...params) => this.setState({
     ui: {
       ...this.state.ui,
@@ -112,7 +112,7 @@ const withDataFetching = Component => class App extends React.Component {
         ...this.state.data,
         products
       }
-    }, () => this.setDefaultQuote(this.state.ui.bases[0]))
+    }, () => this.onSetDefaultQuote(this.state.ui.bases[0]))
   }
 
   onError = error => this.setState({
@@ -134,7 +134,7 @@ const withDataFetching = Component => class App extends React.Component {
     }
   })
 
-  setDefaultQuote = (base) => {
+  onSetDefaultQuote = (base) => {
     const quotes = this.selectQuotesByBase(base)(this.state.data)
 
     this.setState({
@@ -155,7 +155,7 @@ const withDataFetching = Component => class App extends React.Component {
       }
     }, () => {
       if (name === 'base') {
-        this.setDefaultQuote(value)
+        this.onSetDefaultQuote(value)
       }
     })
   }
