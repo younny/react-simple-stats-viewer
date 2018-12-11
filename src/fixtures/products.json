@@ -1,0 +1,19 @@
+[
+  {
+    "id":"BCH-USD",
+    "base_currency":"BCH",
+    "quote_currency":"USD",
+    "base_min_size":"0.01",
+    "base_max_size":"350",
+    "quote_increment":"0.01",
+    "display_name":"BCH/USD",
+    "status":"online",
+    "margin_enabled":false,
+    "status_message":null,
+    "min_market_funds":"10",
+    "max_market_funds":"1000000",
+    "post_only":false,
+    "limit_only":false,
+    "cancel_only":false
+    }
+  ]
