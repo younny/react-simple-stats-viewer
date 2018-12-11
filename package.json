@@ -7,10 +7,7 @@
     "start": "webpack-dev-server --config ./webpack.config.js --mode development",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:unit": "mocha --require @babel/register --require ./test/helpers.js --require ./test/dom.js --require ignore-styles ./src/**/*.spec.js",
-    "test:unit:watch": "npm run test:unit -- --watch",
-    "test:cypress": "start-server-and-test start http://localhost:8080 cypress",
-    "cypress": "cypress run",
-    "cypress:open": "cypress open"
+    "test:unit:watch": "npm run test:unit -- --watch"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +21,6 @@
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
     "chai": "^4.2.0",
-    "cypress": "^3.1.2",
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.7.0",
     "eslint": "^5.9.0",
