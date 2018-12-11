@@ -1,74 +1,74 @@
+/* eslint-env mocha */
 import React from 'react'
 import axios from 'axios'
-import App, { doIncrement, doDecrement } from './App'
-import Counter from './component/Counter'
 
-describe('Local State', () => {
-  it('should increment the counter in state', () => {
-    const state = { counter: 0 }
-    const newState = doIncrement(state)
+import Table from './components/Table'
+import api from './services/api'
+import App from './App'
+import mockProducts from './fixtures/products.json'
+import mockStats from './fixtures/stats.json'
 
-    expect(newState.counter).to.equal(1)
+describe('Fetch products @ AppView Component', () => {
+  let sandbox
+  beforeEach(() => {
+    sandbox = sinon.createSandbox()
   })
 
-  it('should decrement the counter in state', () => {
-    const state = { counter: 1 }
-    const newState = doDecrement(state)
-
-    expect(newState.counter).to.equal(0)
-  })
-})
-
-// shallow() : Compnent Test
-describe('App Component', () => {
-  const result = [3, 5, 9]
-  const promise = Promise.resolve(result)
-
-  before(() => {
-    sinon.stub(axios, 'get').withArgs('http://').returns(promise)
+  afterEach(() => {
+    sandbox.restore()
   })
 
-  after(() => {
-    axios.get.restore()
-  })
-
-  it('renders the Counter wrapper', () => {
-    const wrapper = shallow(<App />)
-    expect(wrapper.find(Counter)).to.have.length(1)
-  })
-
-  it('increments the counter', () => {
-    const wrapper = shallow(<App />)
-
-    wrapper.setState({ counter: 0 })
-    wrapper.find('button').at(0).simulate('click')
-
-    expect(wrapper.state().counter).to.equal(1)
-  })
-
-  it('decrements the counter', () => {
-    const wrapper = shallow(<App />)
-
-    wrapper.setState({ counter: 0 })
-    wrapper.find('button').at(1).simulate('click')
-
-    expect(wrapper.state().counter).to.equal(-1)
-  })
-
-  it('calls componentDidMount', () => {
+  it('calls componentDidMount only once', () => {
     sinon.spy(App.prototype, 'componentDidMount')
 
-    const wrapper = mount(<App />)
+    mount(<App/>)
+
     expect(App.prototype.componentDidMount.calledOnce).to.equal(true)
   })
 
-  it('fetches async counters', () => {
+  it('should update products data after fetching successfully', (done) => {
+    const promise = Promise.resolve({ data: mockProducts })
+    sandbox.stub(axios, 'get').returns(promise)
+
     const wrapper = shallow(<App />)
 
-    expect(wrapper.state().asyncCounters).to.equal(null)
+    expect(wrapper.state().data.products).to.have.lengthOf(0)
 
-    promise.then(() => {
-      expect(wrapper.state().asyncCounters).to.equal(result)
-    })
+    expect(wrapper.state().ui.loading).to.equal(true)
+
+    api.getProducts(() => {})
+      .then(() => {
+        expect(wrapper.state().ui.loading).to.equal(false)
+
+        expect(wrapper.state().data.products).to.equal(mockProducts)
+
+        expect(wrapper.state().ui.base).to.not.equal(null)
+
+        expect(wrapper.state().ui.quote).to.not.equal(null)
+      })
+      .then(done, done)
+  })
+
+  it('should update stats data after fetching successfully', (done) => {
+    const promise = Promise.resolve({ data: mockStats })
+    sandbox.stub(axios, 'get').returns(promise)
+
+    const query = { product_id: 'BCH-USD' }
+    const wrapper = mount(<App />)
+
+    wrapper.find('button').props().onClick()
+
+    expect(wrapper.state().ui.loading).to.equal(true)
+
+    api.getStats(query, () => {})
+      .then(() => {
+        expect(wrapper.state().ui.loading).to.equal(false)
+
+        const newStats = wrapper.state().data.stats
+        expect(newStats).to.equal(mockStats)
+
+        const tableWrappepr = mount(<Table data={newStats} />)
+        expect(tableWrappepr.props().data).to.equal(mockStats)
+      }).then(done, done)
   })
 })
