@@ -12,5 +12,11 @@
   },
   "extends": [
     "airbnb-base"
-  ]
+  ],
+  "globals": {
+      "shallow": true,
+      "mount": true,
+      "expect": true,
+      "sinon": true
+  }
 }
