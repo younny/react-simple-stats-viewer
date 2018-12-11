@@ -60,7 +60,7 @@ const withDataFetching = Component => class App extends React.Component {
       },
       data: {
         products: [],
-        stats: []
+        stats: {}
       }
     }
   }
@@ -118,7 +118,7 @@ const withDataFetching = Component => class App extends React.Component {
   onError = error => this.setState({
     ui: {
       ...this.state.ui,
-      error: JSON.stringify(error.data),
+      error,
       loading: false
     }
   })
